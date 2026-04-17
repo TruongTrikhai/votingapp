@@ -1,4 +1,4 @@
-const contractAddress = "0x7b5fdCb7a5d983cfB70f2EF55aB8DFe7607A2C00";
+const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
 
 const contractAbi = [
     {

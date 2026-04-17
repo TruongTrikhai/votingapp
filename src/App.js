@@ -14,13 +14,16 @@ function App() {
   const [remainingTime, setremainingTime] = useState('');
   const [candidates, setCandidates] = useState([]);
   const [number, setNumber] = useState('');
-  const [CanVote, setCanVote] = useState(true);
+  const [CanVote, setCanVote] = useState(false);
 
 
   useEffect( () => {
-    getCandidates();
-    getRemainingTime();
-    getCurrentStatus();
+    if (isConnected) {
+      getCandidates();
+      getRemainingTime();
+      getCurrentStatus();
+      canVote();
+    }
     if (window.ethereum) {
       window.ethereum.on('accountsChanged', handleAccountsChanged);
     }
@@ -30,7 +33,7 @@ function App() {
         window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
       }
     }
-  });
+  }, [isConnected, account]);
 
 
   async function vote() {
@@ -48,6 +51,7 @@ function App() {
 
 
   async function canVote() {
+    try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
       const signer = provider.getSigner();
@@ -55,11 +59,15 @@ function App() {
         contractAddress, contractAbi, signer
       );
       const voteStatus = await contractInstance.voters(await signer.getAddress());
+      console.log("Vote status:", voteStatus);
       setCanVote(voteStatus);
-
+    } catch (err) {
+      console.error("canVote error:", err);
+    }
   }
 
   async function getCandidates() {
+    try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
       const signer = provider.getSigner();
@@ -67,6 +75,7 @@ function App() {
         contractAddress, contractAbi, signer
       );
       const candidatesList = await contractInstance.getAllVotesOfCandiates();
+      console.log("Candidates from contract:", candidatesList);
       const formattedCandidates = candidatesList.map((candidate, index) => {
         return {
           index: index,
@@ -75,10 +84,14 @@ function App() {
         }
       });
       setCandidates(formattedCandidates);
+    } catch (err) {
+      console.error("getCandidates error:", err);
+    }
   }
 
 
   async function getCurrentStatus() {
+    try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
       const signer = provider.getSigner();
@@ -86,11 +99,15 @@ function App() {
         contractAddress, contractAbi, signer
       );
       const status = await contractInstance.getVotingStatus();
-      console.log(status);
+      console.log("Voting status:", status);
       setVotingStatus(status);
+    } catch (err) {
+      console.error("getCurrentStatus error:", err);
+    }
   }
 
   async function getRemainingTime() {
+    try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
       const signer = provider.getSigner();
@@ -98,8 +115,24 @@ function App() {
         contractAddress, contractAbi, signer
       );
       const time = await contractInstance.getRemainingTime();
-      setremainingTime(parseInt(time, 16));
+      console.log("Remaining time:", time.toNumber());
+      setremainingTime(time.toNumber());
+    } catch (err) {
+      console.error("getRemainingTime error:", err);
+    }
   }
+
+  // Tự động đếm ngược mỗi giây ở Frontend
+  useEffect(() => {
+    if (remainingTime > 0) {
+      const timer = setInterval(() => {
+        setremainingTime((prevTime) => prevTime - 1);
+      }, 1000);
+      return () => clearInterval(timer);
+    } else if (remainingTime === 0 && isConnected) {
+      getCurrentStatus(); // Khi hết giờ, cập nhật lại trạng thái (ẩn nút vote)
+    }
+  }, [remainingTime, isConnected]);
 
   function handleAccountsChanged(accounts) {
     if (accounts.length > 0 && account !== accounts[0]) {
