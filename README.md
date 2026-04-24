@@ -86,25 +86,25 @@ npm start
 #### 1.1.2. Luồng đi của dữ liệu (Data Flow)
 
 ```
-┌─────────────┐    Deploy Contract     ┌──────────────────┐
-│   Owner      │ ─────────────────────▶ │  Blockchain      │
-│  (Deployer)  │    (candidateNames,    │  (Ethereum/      │
-│              │     durationInMinutes) │   Sepolia)       │
-└──────┬───────┘                        └────────┬─────────┘
-       │                                         │
-       │  addCandidate(_name)                    │
-       │ ───────────────────────────────────────▶│
-       │        [chỉ Owner]                      │
-       │                                         │
-┌──────┴───────┐                        ┌────────┴─────────┐
-│   Voter      │    vote(index)         │  Smart Contract  │
-│  (Cử tri)   │ ─────────────────────▶ │  Voting.sol      │
-│              │                        │                  │
-│              │ ◀───────────────────── │  - candidates[]  │
-│              │   getAllVotesOfCandiates│  - voters{}      │
-│              │   getVotingStatus()    │  - votingStart   │
-│              │   getRemainingTime()   │  - votingEnd     │
-└──────────────┘                        └──────────────────┘
++---------------+   Deploy Contract     +--------------------+
+|     Owner     | ------------------->  |    Blockchain      |
+|   (Deployer)  |   (candidateNames,    |    (Ethereum/      |
+|               |    durationInMinutes) |     Sepolia)       |
++-------+-------+                       +---------+----------+
+        |                                        |
+        |  addCandidate(_name)                   |
+        | -------------------------------------> |
+        |        [chi Owner]                     |
+        |                                        |
++-------+-------+                      +---------+----------+
+|     Voter     |   vote(index)        |   Smart Contract   |
+|   (Cu tri)    | -------------------> |   Voting.sol       |
+|               |                      |                    |
+|               | <------------------- |   - candidates[]   |
+|               |  getAllVotesOfCandi..|   - voters{}       |
+|               |  getVotingStatus()   |   - votingStart    |
+|               |  getRemainingTime()  |   - votingEnd      |
++---------------+                      +--------------------+
 ```
 
 **Chi tiết luồng dữ liệu:**
@@ -156,17 +156,17 @@ Hệ thống được chia thành **3 module chính** (on-chain) và **3 module 
 #### Module On-chain (Smart Contract)
 
 ```
-┌─────────────────────────────────────────────────────┐
-│                  Voting.sol                          │
-│  ┌───────────────┐ ┌──────────────┐ ┌─────────────┐ │
-│  │  Module Quản  │ │ Module Xử lý │ │ Module Truy │ │
-│  │  trị (Admin)  │ │  Bỏ phiếu    │ │ vấn (Query) │ │
-│  │               │ │  (Voting)    │ │             │ │
-│  │ - constructor │ │ - vote()     │ │ - getAll..()│ │
-│  │ - addCandidate│ │ - voters{}   │ │ - getStatus │ │
-│  │ - Ownable     │ │              │ │ - getTime() │ │
-│  └───────────────┘ └──────────────┘ └─────────────┘ │
-└─────────────────────────────────────────────────────┘
++-------------------------------------------------------+
+|                      Voting.sol                       |
+|  +-----------------+ +---------------+ +------------+ |
+|  |  Module Quan    | | Module Xu ly  | | Module     | |
+|  |  tri (Admin)    | | Bo phieu      | | Truy van   | |
+|  |                 | | (Voting)      | | (Query)    | |
+|  |  - constructor  | | - vote()      | | - getAll() | |
+|  |  - addCandidate | | - voters{}    | | - getStatus| |
+|  |  - Ownable      | |               | | - getTime()| |
+|  +-----------------+ +---------------+ +------------+ |
++-------------------------------------------------------+
 ```
 
 **Module 1: Quản trị (Admin Module)**
@@ -262,16 +262,16 @@ uint256 public votingEnd;                // Slot 3: Thời điểm kết thúc (
 #### 1.3.4. Sơ đồ quan hệ dữ liệu (Entity Relationship)
 
 ```
-┌──────────────────┐         ┌──────────────────────┐
-│  Voting Contract │         │  Candidate (struct)  │
-│──────────────────│    1:N  │──────────────────────│
-│ votingStart      │────────▶│ name: string         │
-│ votingEnd        │         │ voteCount: uint256   │
-│ _owner (Ownable) │         └──────────────────────┘
-│──────────────────│
-│ voters (mapping) │────────▶  address => bool
-│                  │              (1:1 per address)
-└──────────────────┘
++--------------------+          +----------------------+
+|  Voting Contract   |          |  Candidate (struct)  |
+|--------------------|   1:N    |----------------------|
+|  votingStart       |--------> |  name: string        |
+|  votingEnd         |          |  voteCount: uint256  |
+|  _owner (Ownable)  |          +----------------------+
+|--------------------|
+|  voters (mapping)  |--------> address => bool
+|                    |               (1:1 per address)
++--------------------+
 ```
 
 **Quan hệ:**
@@ -289,30 +289,30 @@ uint256 public votingEnd;                // Slot 3: Thời điểm kết thúc (
 Hệ thống hiện tại sử dụng kiến trúc **đơn thể (Monolithic)** — toàn bộ logic và dữ liệu được gói gọn trong **một file duy nhất** `Voting.sol`, kế thừa `Ownable` từ OpenZeppelin:
 
 ```
-┌─────────────────────────────────────────┐
-│            Voting.sol                    │
-│  ┌─────────────────────────────────────┐ │
-│  │  OpenZeppelin Ownable (kế thừa)    │ │
-│  │  - _owner                           │ │
-│  │  - onlyOwner modifier              │ │
-│  │  - transferOwnership()             │ │
-│  └─────────────────────────────────────┘ │
-│                                          │
-│  Storage (Dữ liệu):                     │
-│  - candidates[] (Candidate struct)       │
-│  - voters mapping                        │
-│  - votingStart, votingEnd                │
-│                                          │
-│  Logic (Nghiệp vụ):                     │
-│  - constructor()                         │
-│  - addCandidate()                        │
-│  - vote()                                │
-│                                          │
-│  View (Truy vấn):                        │
-│  - getAllVotesOfCandiates()               │
-│  - getVotingStatus()                     │
-│  - getRemainingTime()                    │
-└──────────────────────────────────────────┘
++------------------------------------------+
+|              Voting.sol                  |
+|  +--------------------------------------+|
+|  |  OpenZeppelin Ownable (ke thua)      ||
+|  |  - _owner                            ||
+|  |  - onlyOwner modifier                ||
+|  |  - transferOwnership()               ||
+|  +--------------------------------------+|
+|                                          |
+|  Storage (Du lieu):                      |
+|  - candidates[] (Candidate struct)       |
+|  - voters mapping                        |
+|  - votingStart, votingEnd                |
+|                                          |
+|  Logic (Nghiep vu):                      |
+|  - constructor()                         |
+|  - addCandidate()                        |
+|  - vote()                                |
+|                                          |
+|  View (Truy van):                        |
+|  - getAllVotesOfCandiates()              |
+|  - getVotingStatus()                     |
+|  - getRemainingTime()                    |
++------------------------------------------+
 ```
 
 **Ưu điểm của kiến trúc hiện tại:**
@@ -329,33 +329,33 @@ Hệ thống hiện tại sử dụng kiến trúc **đơn thể (Monolithic)** 
 Nếu hệ thống cần mở rộng trong tương lai (ví dụ: nhiều phiên bỏ phiếu, quản trị DAO, token hóa phiếu bầu), kiến trúc nên được phân rã thành các thành phần sau:
 
 ```
-┌──────────────────────────────────────────────────────────────┐
-│                    Kiến trúc Modular (Đề xuất)                │
-│                                                               │
-│  ┌─────────────────┐    implements    ┌────────────────────┐  │
-│  │  IVoting         │◀───────────────│  Voting             │  │
-│  │  (Interface)     │                 │  (Core Contract)    │  │
-│  │                  │                 │                     │  │
-│  │  + vote()        │                 │  Logic nghiệp vụ:  │  │
-│  │  + addCandidate()│                 │  - vote()           │  │
-│  │  + getAll...()   │                 │  - addCandidate()   │  │
-│  │  + getStatus()   │                 │  - getAll...()      │  │
-│  │  + getTime()     │                 │  - getStatus()      │  │
-│  └─────────────────┘                 │  - getTime()        │  │
-│                                       │                     │  │
-│                                       │  Kế thừa:          │  │
-│                                       │  - Ownable          │  │
-│  ┌─────────────────┐    reads/writes  │  - VotingStorage    │  │
-│  │ VotingStorage    │◀───────────────│                     │  │
-│  │ (Storage Contract│                 └────────────────────┘  │
-│  │  / Abstract)     │                                         │
-│  │                  │                                         │
-│  │  - candidates[]  │                                         │
-│  │  - voters{}      │                                         │
-│  │  - votingStart   │                                         │
-│  │  - votingEnd     │                                         │
-│  └─────────────────┘                                         │
-└──────────────────────────────────────────────────────────────┘
++-----------------------------------------------------------------+
+|                   Kien truc Modular (De xuat)                   |
+|                                                                 |
+|  +-------------------+   implements   +----------------------+  |
+|  |  IVoting          | <------------  |  Voting              |  |
+|  |  (Interface)      |                |  (Core Contract)     |  |
+|  |                   |                |                      |  |
+|  |  + vote()         |                |  Logic nghiep vu:    |  |
+|  |  + addCandidate() |                |  - vote()            |  |
+|  |  + getAll...()    |                |  - addCandidate()    |  |
+|  |  + getStatus()    |                |  - getAll...()       |  |
+|  |  + getTime()      |                |  - getStatus()       |  |
+|  +-------------------+                |  - getTime()         |  |
+|                                       |                      |  |
+|                                       |  Ke thua:            |  |
+|                                       |  - Ownable           |  |
+|  +-------------------+   reads/writes |  - VotingStorage     |  |
+|  |  VotingStorage    | <------------  |                      |  |
+|  |  (Storage Contract|                +----------------------+  |
+|  |   / Abstract)     |                                          |
+|  |                   |                                          |
+|  |  - candidates[]   |                                          |
+|  |  - voters{}       |                                          |
+|  |  - votingStart    |                                          |
+|  |  - votingEnd      |                                          |
+|  +-------------------+                                          |
++-----------------------------------------------------------------+
 ```
 
 #### 2.1.3. Chi tiết từng thành phần
@@ -522,58 +522,58 @@ Hợp đồng Voting hoạt động như một **máy trạng thái hữu hạn 
 
 ```
               Deploy Contract
-                    │
-                    ▼
-    ┌───────────────────────────────┐
-    │         INITIALIZED           │
-    │  (Trạng thái Khởi tạo)       │
-    │                               │
-    │  • candidates[] được tạo      │
-    │  • votingStart = now          │
-    │  • votingEnd = now + duration │
-    │  • voters{} rỗng              │
-    │                               │
-    │  Trigger: block.timestamp     │
-    │           >= votingStart      │
-    └───────────┬───────────────────┘
-                │ (tự động, cùng block)
-                ▼
-    ┌───────────────────────────────┐
-    │           ACTIVE              │
-    │  (Trạng thái Đang bỏ phiếu)  │
-    │                               │
-    │  • getVotingStatus() = true   │
-    │  • getRemainingTime() > 0     │
-    │  • vote() ✅ được phép        │
-    │  • addCandidate() ✅ (Owner)  │
-    │                               │
-    │  Hành động khả dụng:          │
-    │  ├─ Voter gọi vote(index)     │
-    │  │  → voteCount++             │
-    │  │  → voters[addr] = true     │
-    │  │                            │
-    │  └─ Owner gọi addCandidate() │
-    │     → candidates.push(...)    │
-    │                               │
-    │  Trigger: block.timestamp     │
-    │           >= votingEnd        │
-    └───────────┬───────────────────┘
-                │ (tự động theo thời gian)
-                ▼
-    ┌───────────────────────────────┐
-    │          FINISHED             │
-    │  (Trạng thái Kết thúc)       │
-    │                               │
-    │  • getVotingStatus() = false  │
-    │  • getRemainingTime() = 0     │
-    │  • vote() ❌ bị revert        │
-    │  • addCandidate() ✅ (Owner)  │
-    │  • getAllVotes...() ✅ đọc    │
-    │    kết quả cuối cùng          │
-    │                               │
-    │  ⚠ Trạng thái KHÔNG thể      │
-    │    quay lại ACTIVE            │
-    └───────────────────────────────┘
+                    |
+                    v
+    +---------------------------------+
+    |          INITIALIZED            |
+    |    (Trang thai Khoi tao)        |
+    |                                 |
+    |  - candidates[] duoc tao        |
+    |  - votingStart = now            |
+    |  - votingEnd = now + duration   |
+    |  - voters{} rong                |
+    |                                 |
+    |  Trigger: block.timestamp       |
+    |           >= votingStart        |
+    +----------------+----------------+
+                     | (tu dong, cung block)
+                     v
+    +---------------------------------+
+    |            ACTIVE               |
+    |    (Trang thai Dang bo phieu)   |
+    |                                 |
+    |  - getVotingStatus() = true     |
+    |  - getRemainingTime() > 0       |
+    |  - vote() [OK] duoc phep        |
+    |  - addCandidate() [OK] (Owner)  |
+    |                                 |
+    |  Hanh dong kha dung:            |
+    |  +- Voter goi vote(index)       |
+    |  |  -> voteCount++              |
+    |  |  -> voters[addr] = true      |
+    |  |                              |
+    |  +- Owner goi addCandidate()    |
+    |     -> candidates.push(...)     |
+    |                                 |
+    |  Trigger: block.timestamp       |
+    |           >= votingEnd          |
+    +----------------+----------------+
+                     | (tu dong theo thoi gian)
+                     v
+    +---------------------------------+
+    |           FINISHED              |
+    |    (Trang thai Ket thuc)        |
+    |                                 |
+    |  - getVotingStatus() = false    |
+    |  - getRemainingTime() = 0       |
+    |  - vote() [X] bi revert         |
+    |  - addCandidate() [OK] (Owner)  |
+    |  - getAllVotes...() [OK] doc    |
+    |    ket qua cuoi cung            |
+    |                                 |
+    |  [!] Trang thai KHONG the       |
+    |      quay lai ACTIVE            |
+    +---------------------------------+
 ```
 
 #### 2.2.1. Bảng chuyển trạng thái (State Transition Table)
@@ -601,10 +601,10 @@ Hợp đồng Voting hoạt động như một **máy trạng thái hữu hạn 
 **3. Ranh giới trạng thái bằng thời gian (Time-based Boundaries):**
 ```
 Timeline:
-─────────|═══════════════════════════|─────────────────▶ t
+---------|===========================|-----------------> t
      votingStart                votingEnd
-         │       ACTIVE              │    FINISHED
-         │   (vote() cho phép)       │  (vote() revert)
+         |       ACTIVE              |    FINISHED
+         |   (vote() cho phep)       |  (vote() revert)
 ```
 
 #### 2.2.3. So sánh: Implicit State vs Explicit State
@@ -1350,17 +1350,17 @@ Dự án đã được triển khai thành công trên Sepolia Testnet:
 ### 4.5. Tổng kết quy trình phát triển (Development Workflow)
 
 ```
-┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
-│  1. Code │───▶│ 2. Test  │───▶│ 3. Local │───▶│4. Testnet│───▶│5. Mainnet│
-│  Solidity│    │  Unit    │    │   Node   │    │ (Sepolia)│    │(Optional)│
-│  + React │    │  Tests   │    │  Deploy  │    │  Deploy  │    │  Deploy  │
-└──────────┘    └──────────┘    └──────────┘    └──────────┘    └──────────┘
-     │               │               │               │               │
-  Viết code      npx hardhat     npx hardhat     npx hardhat     Khi đã
-  .sol + .jsx      test            node          ignition       hoàn toàn
-                                 + ignition      --network       sẵn sàng
-                  11 tests        deploy         sepolia
-                  passing         localhost
++------------+   +------------+   +------------+   +------------+   +------------+
+|  1. Code   |-->|  2. Test   |-->|  3. Local  |-->| 4. Testnet |-->| 5. Mainnet |
+|  Solidity  |   |  Unit      |   |   Node     |   |  (Sepolia) |   | (Optional) |
+|  + React   |   |  Tests     |   |  Deploy    |   |  Deploy    |   |  Deploy    |
++------------+   +------------+   +------------+   +------------+   +------------+
+      |                |                |                |                |
+   Viet code      npx hardhat     npx hardhat      npx hardhat      Khi da
+   .sol + .jsx      test            node           ignition        hoan toan
+                                  + ignition       --network        san sang
+                   11 tests        deploy          sepolia
+                   passing         localhost
 ```
 
 **Nguyên tắc quan trọng:**
