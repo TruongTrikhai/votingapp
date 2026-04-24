@@ -1,24 +1,62 @@
+# React Voting Application
 
+Dự án này là một DApp (Decentralized Application) bầu cử toàn diện được xây dựng trên nền tảng **React**, **Hardhat v2**, **Ethers v6**, **TypeScript**, và sử dụng các tiêu chuẩn bảo mật của **OpenZeppelin**. Quá trình triển khai hợp đồng thông minh được thực hiện qua **Hardhat Ignition**.
 
-## Installation
+## 1. Cài đặt (Installation)
 
-After you cloned the repository, you want to install the packages using
+Sau khi clone dự án về máy, hãy cài đặt các thư viện cần thiết:
 
 ```shell
 npm install
 ```
 
-You first need to compile the contract and upload it to the blockchain network. Run the following commands to compile and upload the contract.
+## 2. Kiểm thử (Testing)
 
+Dự án bao gồm một bộ Unit Tests toàn diện (viết bằng TypeScript + Mocha + Chai) với độ bao phủ cao, kiểm tra tất cả các logic từ khởi tạo, cấp quyền (Ownable), cho đến kiểm soát thời gian bỏ phiếu.
+
+Để chạy bộ kiểm thử:
 ```shell
-npx hardhat compile
-npx hardhat run --network sepolia scripts/deploy.js
+npx hardhat test
 ```
 
-Once the contract is uploaded to the blockchain, copy the contract address and copy it in the .env file. You can also use another blockchain by writing the blockchain's endpoint in hardhat-config.
+## 3. Triển khai Smart Contract (Deployment)
 
-Once you have pasted your private key and contract address in the .env file, simply run command
+Việc triển khai được cấu hình tự động thông qua Hardhat Ignition.
+
+**Bước 1:** Tạo một file `.env` ở **thư mục gốc** của dự án (nếu chưa có) và điền các cấu hình của bạn:
+```env
+PRIVATE_KEY=your_private_key_here
+API_URL=your_rpc_url_here
+```
+*(Lưu ý: Không bao giờ commit file `.env` lên Github).*
+
+**Bước 2:** Chọn môi trường deploy:
+
+*   **Deploy lên mạng Localhost (Mạng giả lập Hardhat):**
+    Mở một terminal và khởi chạy Node:
+    ```shell
+    npx hardhat node
+    ```
+    Mở terminal thứ 2 và chạy script triển khai:
+    ```shell
+    npx hardhat ignition deploy ./ignition/modules/Voting.ts --network localhost
+    ```
+
+*   **Deploy lên Testnet (Ví dụ: Sepolia):**
+    ```shell
+    npx hardhat ignition deploy ./ignition/modules/Voting.ts --network sepolia
+    ```
+
+## 4. Chạy giao diện Frontend (React)
+
+Sau khi hợp đồng thông minh được triển khai, hãy **sao chép địa chỉ hợp đồng (Contract Address)** hiển thị trên terminal.
+
+1. Vào file hằng số (thường nằm ở `src/Constant/constant.js` hoặc file `.env` của React).
+2. Dán địa chỉ hợp đồng mới vào biến `contractAddress`.
+3. Lưu lại và khởi động giao diện React:
 
 ```shell
 npm start
 ```
+
+Ứng dụng sẽ tự động mở lên tại `http://localhost:3000`. Hãy đảm bảo ví Metamask của bạn đã được chuyển sang đúng mạng lưới mà bạn vừa deploy.

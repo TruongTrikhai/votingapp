@@ -37,9 +37,9 @@ function App() {
 
 
   async function vote() {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const provider = new ethers.BrowserProvider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
-      const signer = provider.getSigner();
+      const signer = await provider.getSigner();
       const contractInstance = new ethers.Contract (
         contractAddress, contractAbi, signer
       );
@@ -52,9 +52,9 @@ function App() {
 
   async function canVote() {
     try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const provider = new ethers.BrowserProvider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
-      const signer = provider.getSigner();
+      const signer = await provider.getSigner();
       const contractInstance = new ethers.Contract (
         contractAddress, contractAbi, signer
       );
@@ -68,9 +68,9 @@ function App() {
 
   async function getCandidates() {
     try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const provider = new ethers.BrowserProvider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
-      const signer = provider.getSigner();
+      const signer = await provider.getSigner();
       const contractInstance = new ethers.Contract (
         contractAddress, contractAbi, signer
       );
@@ -80,7 +80,7 @@ function App() {
         return {
           index: index,
           name: candidate.name,
-          voteCount: candidate.voteCount.toNumber()
+          voteCount: Number(candidate.voteCount)
         }
       });
       setCandidates(formattedCandidates);
@@ -92,9 +92,9 @@ function App() {
 
   async function getCurrentStatus() {
     try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const provider = new ethers.BrowserProvider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
-      const signer = provider.getSigner();
+      const signer = await provider.getSigner();
       const contractInstance = new ethers.Contract (
         contractAddress, contractAbi, signer
       );
@@ -108,15 +108,15 @@ function App() {
 
   async function getRemainingTime() {
     try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const provider = new ethers.BrowserProvider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
-      const signer = provider.getSigner();
+      const signer = await provider.getSigner();
       const contractInstance = new ethers.Contract (
         contractAddress, contractAbi, signer
       );
       const time = await contractInstance.getRemainingTime();
-      console.log("Remaining time:", time.toNumber());
-      setremainingTime(time.toNumber());
+      console.log("Remaining time:", Number(time));
+      setremainingTime(Number(time));
     } catch (err) {
       console.error("getRemainingTime error:", err);
     }
@@ -147,10 +147,10 @@ function App() {
   async function connectToMetamask() {
     if (window.ethereum) {
       try {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const provider = new ethers.BrowserProvider(window.ethereum);
         setProvider(provider);
         await provider.send("eth_requestAccounts", []);
-        const signer = provider.getSigner();
+        const signer = await provider.getSigner();
         const address = await signer.getAddress();
         setAccount(address);
         console.log("Metamask Connected : " + address);
