@@ -1,7 +1,10 @@
 import { expect } from "chai";
-import { ethers } from "hardhat";
-import "@nomicfoundation/hardhat-chai-matchers";
-import { loadFixture, time } from "@nomicfoundation/hardhat-toolbox/network-helpers";
+import hre from "hardhat";
+
+const { ethers, networkHelpers } = await hre.network.getOrCreate();
+const { loadFixture, time } = networkHelpers;
+
+import type { Voting } from "../typechain-types";
 
 describe("Voting Contract", function () {
   const candidateNames = ["Alice", "Bob", "Charlie"];
@@ -9,8 +12,8 @@ describe("Voting Contract", function () {
 
   async function deployVotingFixture() {
     const [owner, voter1, voter2, otherAccount] = await ethers.getSigners();
-    const Voting = await ethers.getContractFactory("Voting");
-    const voting = await Voting.deploy(candidateNames, durationInMinutes);
+    const VotingFactory = await ethers.getContractFactory("Voting");
+    const voting = await VotingFactory.deploy(candidateNames, durationInMinutes) as unknown as Voting;
     return { voting, owner, voter1, voter2, otherAccount };
   }
 

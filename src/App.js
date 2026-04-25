@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import {ethers} from 'ethers';
-import {contractAbi, contractAddress} from './Constant/constant';
-import Login from './Components/Login';
-import Finished from './Components/Finished';
-import Connected from './Components/Connected';
+import {contractAbi, contractAddress} from './Constant/constant.js';
+import Login from './Components/Login.jsx';
+import Finished from './Components/Finished.jsx';
+import Connected from './Components/Connected.jsx';
 import './App.css';
 
 function App() {

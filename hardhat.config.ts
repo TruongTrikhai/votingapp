@@ -1,21 +1,25 @@
-import { HardhatUserConfig } from "hardhat/config";
-import "@nomicfoundation/hardhat-toolbox";
+import { defineConfig } from "hardhat/config";
+import toolboxMochaEthers from "@nomicfoundation/hardhat-toolbox-mocha-ethers";
 import * as dotenv from "dotenv";
 
 dotenv.config();
 
 const { API_URL, PRIVATE_KEY } = process.env;
 
-const config: HardhatUserConfig = {
-  solidity: "0.8.24",
-  // defaultNetwork: "sepolia",
+export default defineConfig({
+  plugins: [toolboxMochaEthers],
+  solidity: {
+    version: "0.8.24",
+  },
   networks: {
-    hardhat: {},
+    hardhat: {
+      type: "edr-simulated",
+      chainType: "l1",
+    },
     sepolia: {
-      url: API_URL || "",
+      type: "http",
+      url: API_URL || "https://rpc.sepolia.org",
       accounts: PRIVATE_KEY ? [`0x${PRIVATE_KEY}`] : [],
     }
   },
-};
-
-export default config;
+});

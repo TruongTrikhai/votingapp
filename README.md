@@ -1,8 +1,12 @@
 # React Voting Application
 
-Dự án này là một DApp (Decentralized Application) bầu cử toàn diện được xây dựng trên nền tảng **React**, **Hardhat v2**, **Ethers v6**, **TypeScript**, và sử dụng các tiêu chuẩn bảo mật của **OpenZeppelin**. Quá trình triển khai hợp đồng thông minh được thực hiện qua **Hardhat Ignition**.
+Dự án này là một DApp (Decentralized Application) bầu cử toàn diện được xây dựng trên nền tảng **React**, **Hardhat v3**, **Ethers v6**, **TypeScript**, và sử dụng các tiêu chuẩn bảo mật của **OpenZeppelin**. Quá trình triển khai hợp đồng thông minh được thực hiện qua **Hardhat Ignition**.
 
-## 1. Cài đặt (Installation)
+## 1. Yêu cầu hệ thống (Prerequisites)
+
+- Node.js >= 18.0.0 (Hardhat v3 yêu cầu Node 18 trở lên và môi trường ESM).
+
+## 2. Cài đặt (Installation)
 
 Sau khi clone dự án về máy, hãy cài đặt các thư viện cần thiết:
 
@@ -10,7 +14,7 @@ Sau khi clone dự án về máy, hãy cài đặt các thư viện cần thiế
 npm install
 ```
 
-## 2. Kiểm thử (Testing)
+## 3. Kiểm thử (Testing)
 
 Dự án bao gồm một bộ Unit Tests toàn diện (viết bằng TypeScript + Mocha + Chai) với độ bao phủ cao, kiểm tra tất cả các logic từ khởi tạo, cấp quyền (Ownable), cho đến kiểm soát thời gian bỏ phiếu.
 
@@ -19,7 +23,7 @@ Dự án bao gồm một bộ Unit Tests toàn diện (viết bằng TypeScript 
 npx hardhat test
 ```
 
-## 3. Triển khai Smart Contract (Deployment)
+## 4. Triển khai Smart Contract (Deployment)
 
 Việc triển khai được cấu hình tự động thông qua Hardhat Ignition.
 
@@ -47,7 +51,19 @@ API_URL=your_rpc_url_here
     npx hardhat ignition deploy ./ignition/modules/Voting.ts --network sepolia
     ```
 
-## 4. Chạy giao diện Frontend (React)
+**Cách triển khai một hợp đồng hoàn toàn mới (Redeploy)**
+
+Nếu hợp đồng cũ của bạn đã hết hạn (Voting Finished) và bạn muốn khởi tạo lại từ đầu, hãy thêm cờ `--reset` vào lệnh deploy. Thao tác này sẽ xóa lịch sử deploy cũ và tạo ra một Contract Address mới tinh:
+
+```shell
+# Trên Localhost
+npx hardhat ignition deploy ./ignition/modules/Voting.ts --network localhost --reset
+
+# Trên Sepolia
+npx hardhat ignition deploy ./ignition/modules/Voting.ts --network sepolia --reset
+```
+
+## 5. Chạy giao diện Frontend (React)
 
 Sau khi hợp đồng thông minh được triển khai, hãy **sao chép địa chỉ hợp đồng (Contract Address)** hiển thị trên terminal.
 
