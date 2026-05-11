@@ -1,99 +1,161 @@
-.login-container {
+/* App container to center everything */
+.App {
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  height: 100vh;
-  background-color: #f1f1f1;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem;
 }
 
-.welcome-message {
-  font-size: 2rem;
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.login-button {
-  background-color: #007bff;
-  color: #fff;
-  font-size: 1.2rem;
-  border: none;
-  border-radius: 0.3rem;
-  padding: 1rem 2rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.login-button:hover {
-  background-color: #0069d9;
-}
-
-
+/* Base Glassmorphism Container */
+.login-container,
 .connected-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
-  background-color: #f1f1f1;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  border-radius: 24px;
+  padding: 3rem;
+  width: 100%;
+  max-width: 800px;
+  animation: fadeIn 0.8s ease-out;
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Typography */
+.welcome-message,
 .connected-header {
-  font-size: 2rem;
+  font-size: 2.5rem;
+  font-weight: 800;
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
+  background: -webkit-linear-gradient(45deg, #00f2fe, #4facfe, #a18cd1, #fbc2eb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0px 4px 20px rgba(0, 242, 254, 0.2);
 }
 
 .connected-account {
   font-size: 1.2rem;
+  font-weight: 300;
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
+  color: #d1d5db;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.8rem 1.5rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+/* Premium Buttons */
+.login-button,
 .connected-button {
-  background-color: #007bff;
+  background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
   color: #fff;
   font-size: 1.2rem;
+  font-weight: 600;
   border: none;
-  border-radius: 0.3rem;
-  padding: 1rem 2rem;
+  border-radius: 12px;
+  padding: 1rem 2.5rem;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+  margin-bottom: 1.5rem;
+  margin-top: 1rem;
 }
 
+.login-button:hover,
 .connected-button:hover {
-  background-color: #0069d9;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(79, 172, 254, 0.6);
 }
 
-.connected-contract-address {
-  font-size: 1.2rem;
+.login-button:active,
+.connected-button:active {
+  transform: translateY(1px);
+}
+
+/* Modern Inputs */
+input[type=number] {
+  padding: 1rem 1.5rem;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  outline: none;
+  transition: all 0.3s ease;
+  width: 250px;
   text-align: center;
 }
 
-
-.candidates-table {
-  border-collapse: collapse;
-  width: 50%;
-  text-align:center;
+input[type=number]:focus {
+  border-color: #4facfe;
+  box-shadow: 0 0 15px rgba(79, 172, 254, 0.3);
+  background: rgba(0, 0, 0, 0.4);
 }
 
-.candidates-table th, .candidates-table td {
-  padding: 8px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
+input[type=number]::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Table Redesign */
+.candidates-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 2rem;
+  overflow: hidden;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.candidates-table th, 
+.candidates-table td {
+  padding: 1.2rem 1rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .candidates-table th {
-  background-color: #f2f2f2;
+  background-color: rgba(255, 255, 255, 0.05);
+  font-weight: 600;
+  color: #a18cd1;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
 }
 
-input[type=number] {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-  font-size: 16px;
-  margin-bottom: 10px;
+.candidates-table tbody tr {
+  transition: all 0.3s ease;
 }
 
+.candidates-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.candidates-table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  transform: scale(1.01);
+}
+
+/* Minor Utility Classes */
+br {
+  display: none; /* Hide breaks, use margins instead */
+}
