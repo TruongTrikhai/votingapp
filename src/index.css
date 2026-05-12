@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
 html, body {
   margin: 0;
@@ -10,10 +10,11 @@ html, body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(-45deg, #0b0f19, #1a1025, #102131, #2d1b4e);
+  /* Premium Light mode gradient background */
+  background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
   background-size: 400% 400%;
   animation: gradientBG 15s ease infinite;
-  color: #ffffff;
+  color: #1f2937; /* Dark gray for text */
 }
 
 @keyframes gradientBG {
