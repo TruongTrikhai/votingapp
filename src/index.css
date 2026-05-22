@@ -1,39 +1,118 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
+:root {
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
+  --primary-light: rgba(99, 102, 241, 0.15);
+  --secondary: #06b6d4;
+  --secondary-light: rgba(6, 182, 212, 0.15);
+  --accent: #d946ef;
+  --success: #10b981;
+  --success-light: rgba(16, 185, 129, 0.15);
+  --warning: #f59e0b;
+  
+  /* Futuristic Cyber Dark Theme Colors */
+  --bg-dark: #030712;
+  --bg-gradient-start: #080b16;
+  --bg-gradient-end: #0f111a;
+  --card-bg: rgba(17, 24, 39, 0.7);
+  --card-border: rgba(255, 255, 255, 0.06);
+  --card-border-active: rgba(99, 102, 241, 0.4);
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-light: #64748b;
+  --border-light: rgba(255, 255, 255, 0.05);
+  
+  /* Neon shadows */
+  --shadow-premium: 0 20px 40px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.02);
+  --shadow-glow-indigo: 0 0 25px -5px rgba(99, 102, 241, 0.35);
+  --shadow-glow-cyan: 0 0 25px -5px rgba(6, 182, 212, 0.3);
+}
+
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
   width: 100%;
   font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Premium Light mode gradient background */
-  background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
-  background-size: 400% 400%;
-  animation: gradientBG 15s ease infinite;
-  color: #1f2937; /* Dark gray for text */
+  background: var(--bg-dark);
+  color: var(--text-main);
+  overflow-x: hidden;
 }
 
-@keyframes gradientBG {
-  0% {
-    background-position: 0% 50%;
+/* Dynamic space background with moving neon lights */
+body::before,
+body::after {
+  content: "";
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  z-index: -1;
+  filter: blur(150px);
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+body::before {
+  top: -150px;
+  right: -100px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.4) 0%, rgba(3, 7, 18, 0) 70%);
+  animation: floatLight1 20s infinite ease-in-out;
+}
+
+body::after {
+  bottom: -150px;
+  left: -100px;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.45) 0%, rgba(3, 7, 18, 0) 70%);
+  animation: floatLight2 25s infinite ease-in-out;
+}
+
+@keyframes floatLight1 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
   }
   50% {
-    background-position: 100% 50%;
+    transform: translate(-100px, 80px) scale(1.2);
   }
-  100% {
-    background-position: 0% 50%;
+}
+
+@keyframes floatLight2 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1.2);
+  }
+  50% {
+    transform: translate(120px, -60px) scale(0.9);
   }
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* Custom cyber scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(3, 7, 18, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.3);
+  border-radius: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(6, 182, 212, 0.5);
 }

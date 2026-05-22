@@ -9,6 +9,7 @@ import './App.css';
 function App() {
   const [provider, setProvider] = useState(null);
   const [account, setAccount] = useState(null);
+  const [balance, setBalance] = useState('0.00');
   const [isConnected, setIsConnected] = useState(false);
   const [votingStatus, setVotingStatus] = useState(true);
   const [remainingTime, setremainingTime] = useState('');
@@ -23,6 +24,7 @@ function App() {
       getRemainingTime();
       getCurrentStatus();
       canVote();
+      if (account) fetchBalance(account);
     }
     if (window.ethereum) {
       window.ethereum.on('accountsChanged', handleAccountsChanged);
@@ -65,6 +67,17 @@ function App() {
       console.error("canVote error:", err);
     }
   }
+
+  async function fetchBalance(address) {
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const rawBalance = await provider.getBalance(address);
+      setBalance(Number(ethers.formatEther(rawBalance)).toFixed(4));
+    } catch (err) {
+      console.error("fetchBalance error:", err);
+    }
+  }
+
 
   async function getCandidates() {
     try {
@@ -156,6 +169,7 @@ function App() {
         console.log("Metamask Connected : " + address);
         setIsConnected(true);
         canVote();
+        fetchBalance(address);
       } catch (err) {
         console.error(err);
       }
@@ -172,6 +186,7 @@ function App() {
     <div className="App">
       { votingStatus ? (isConnected ? (<Connected 
                       account = {account}
+                      balance = {balance}
                       candidates = {candidates}
                       remainingTime = {remainingTime}
                       number= {number}
